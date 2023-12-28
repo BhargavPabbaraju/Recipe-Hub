@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<br>
+
+{% with messages=get_flashed_messages(with_categories=true)[:1] %}
+{% for category, message in messages %}
+    <div class='alert alert-{{category}} bg-danger text-light text-center alert-dismissible fade show m-auto mt-5'>
+        {{ message }}
+    </div>
+{% endfor %}
+{% endwith %}
+
+
+
+
+
+<h2 class="text-primary mt-5">Recipe Categories</h2>
+
+<!-- Display Recipe Category Icons -->
+<div class="row row-cols-1 row-cols-md-5 g-5 text-center">
+    {% for category in categories %}
+    <div class="col">
+      <a href="{{url_for('category',category_name=category['recipe_category_name'])}}" class="text-decoration-none text-dark d-block mb-3">
+        <img src="{{ category['recipe_category_image'] }}" alt="{{ category['recipe_category_name'] }}" class="img-thumbnail rounded-circle mx-auto d-block" style="width: 100px; height: 100px;">
+        <p class="mb-0">{{ category['recipe_category_name'] }}</p>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+
+  <h2 class="text-primary mt-5">Top Rated Recipes</h2>
+
+<div class="row row-cols-1 row-cols-md-4 g-4">
+  {% for recipe in recipes %}
+  <div class="col">
+    <a href="{{ url_for('recipe', recipe_name=recipe['recipe_name'])}}" class="text-decoration-none text-dark">
+      <div class="card h-100">
+          <div style="height: 200px; overflow: hidden; position: relative;">
+              {% if recipe['images']|count > 0 %}
+              <img class="card-img-top w-100" src="{{ recipe['images'][0]['recipe_image'] }}" alt="Card image cap">
+              {% else %}
+              <img class="card-img-top w-100" src="{{ url_for('static', filename='no_image_found.png') }}" alt="Card image cap">
+              {% endif %}
+              <div class="position-absolute top-0 mt-2 me-6 favorite-icon fs-5 text-light" style="position:absolute;right:75px;">
+                <span>{{recipe['like_count']}}</span>
+              </div>
+              <div class="position-absolute top-0 end-0 mt-2 me-2 favorite-icon">
+                <div class="text-decoration-none text-dark d-inline-block rounded-circle p-1 bg-dark d-flex justify-content-center " style="width: 40px; height: 40px;" data-recipe="{{ recipe['recipe_name'] }}">
+                    {% if session['user'] and recipe['user_liked_recipe'] %}
+                    <i class="bi bi-heart-fill fs-4 text-secondary" id="heart"></i>
+                    {% else %}
+                    <i class="bi bi-heart fs-4 text-secondary" id="heart"></i>
+                    {% endif %}
+                </div>
+              </div>
+          </div>
+          <div class="card-body">
+              <a href="{{ url_for('recipe', recipe_name=recipe['recipe_name'])}}" class="text-decoration-none">
+                  <h5 class="card-title mb-3">{{ recipe['recipe_name'] }}</h5>
+              </a>
+              <div class="rating-stars">
+                  {% set rating = recipe['rating'] %}
+                  {% for i in range(1, 6) %}
+                      {% if rating >= i %}
+                          <i class="bi bi-star-fill text-warning"></i>
+                      {% elif rating + 0.5 >= i %}
+                          <i class="bi bi-star-half text-warning"></i>
+                      {% else %}
+                          <i class="bi bi-star text-warning"></i>
+                      {% endif %}
+                  {% endfor %}
+              </div>
+          </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+  // Script to handle the favorite icon click
+  document.querySelectorAll('.favorite-icon').forEach(function(icon) {
+      icon.addEventListener('click', function(event) {
+          event.preventDefault();
+          let recipeName = this.querySelector('a').getAttribute('data-recipe');
+          // Handle favorite action here (e.g., make AJAX request)
+          // Example:
+          console.log('Favorite clicked for recipe: ' + recipeName);
+      });
+  });
+</script>
+
+<style>
+  /* CSS for underlined recipe name on hover */
+  .card-title:hover {
+      text-decoration: underline;
+      cursor: pointer;
+      color: #cf8083;
+  }
+</style>
+
+
+{% endblock %}
+

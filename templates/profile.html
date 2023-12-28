@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row mt-5">
+    <br>
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 text-center">
+            <!-- Avatar -->
+            <img src={{avatar}} alt="User Avatar" class="avatar-img rounded-circle" width="128px" height="128px">
+
+            <!-- First Name -->
+            <h2 class="mt-2">{{session['user']['first_name']}}</h2>
+
+            <!-- Last Name -->
+            <h2>{{session['user']['last_name']}}</h2>
+        </div>
+    </div>
+    <div class="row ms-4 mt-5">
+        <!-- Editable Preferences -->
+        <p><strong>Preferences:</strong> 
+            {% for preference in session['user']['preferences'] %}
+                {{preference['preference']}}, 
+            {% endfor %}
+        <i class="bi bi-pencil-fill text-primary fs-5" id="edit-icon"></i></p>
+    </div>
+    
+    
+    
+</div>
+
+<div class="position-absolute top-0 end-0 mt-5 me-4">
+    <!-- Logout Button -->
+    <form action="/logout" method="post" class="mt-3">
+        <button type="submit" class="btn btn-danger">Logout</button>
+    </form>
+</div>
+
+<div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editReviewModalLabel">Edit Review</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editReviewForm" method="post" action="{{url_for('edit_preferences')}}">
+            <div class="form-group">
+                <label class="mb-4">Preferences</label>
+                <div class="form-check">
+                    <input type="checkbox" name="preferences" class="form-check-input" id="vegan" value="vegan">
+                    <label class="form-check-label" for="vegan">Vegan</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="preferences" class="form-check-input" id="vegetarian" value="vegetarian">
+                    <label class="form-check-label" for="vegetarian">Vegetarian</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="preferences" class="form-check-input" id="glutenFree" value="gluten-free">
+                    <label class="form-check-label" for="glutenFree">Gluten Free</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="preferences" class="form-check-input" id="egg" value="egg">
+                    <label class="form-check-label" for="egg">Egg</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="preferences" class="form-check-input" id="meat" value="meat">
+                    <label class="form-check-label" for="meat">Meat</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-4">Save changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div> 
+
+<div class="position-relative text-center">
+    <!-- Logout Button -->
+    <form action="/delete_account" method="post" class="mt-3">
+        <button type="submit" class="btn btn-danger">Delete Account</button>
+    </form>
+</div>
+
+
+  <script>
+    $(document).ready(function() {
+    $('#edit-icon').click(function() {
+        $('#editReviewModal').modal('show');
+    });
+    });
+  </script>
+
+
+
+{% endblock %}
+

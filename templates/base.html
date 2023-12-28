@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <title>Modern Kitchen</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <!-- Link to Minty Bootstrap CSS -->
+    <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+</head>
+
+<body class="container">
+   <!-- Bootstrap Javascripts -->  
+   
+    <nav class="navbar navbar-expand-lg bg-dark fixed-top" data-bs-theme="dark" >
+        <div class="container-fluid">
+          <div class="collapse navbar-collapse" id="navbarColor02">
+            <ul class="navbar-nav me-auto">
+              <li class="nav-item ms-5">
+                <a class="nav-link {{'active' if session['page']=='Home'}}" href="/">Home
+                  <span class="visually-hidden">(current)</span>
+                </a>
+              </li>
+              <li class="nav-item ms-5">
+                <a class="nav-link" href="{{url_for('meal_plans')}}">Meal Plans</a>
+              </li>
+              <li class="nav-item dropdown ms-5">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Cuisines</a>
+                <div class="dropdown-menu">
+                  {% for cuisine in session['cuisines'] %}
+                  <a class="dropdown-item" href="{{url_for('cuisine',cuisine_name=cuisine['cuisine_name'])}}">{{cuisine['cuisine_name'][0].upper() + cuisine['cuisine_name'][1:]}}</a>
+                  {% endfor %}
+                </div>
+              </li>
+              <li class="nav-item ms-5">
+                <a class="nav-link" href={{url_for("trends")}}>Trends</a>
+              </li>
+            </ul>
+            <form class="d-flex" action="/search" method="post">
+              <input class="form-control me-sm-2" name="query" type="search" placeholder="Search">
+              <button class="btn btn-secondary my-2 my-sm-0 " type="submit">Search</button>
+            </form>
+            {% if not session['user'] %}
+            <a href="/login" class="ms-3 p-2"><i class="bi bi-person-circle pe-2"></i>Log In</a>
+            {% else %}
+            <a href="/profile" class="ms-3 p-2"><i class="bi bi-person-circle pe-2"></i>Profile</a>
+            {% endif %}
+          </div>
+        </div>
+      </nav>
+
+      
+
+      {% block content %}
+
+      {% endblock %}
+
+
+   
+
+   
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br>
+<h2 class="text-primary mt-5">User Preferences</h2>
+<img src="{{ url_for('static', filename='user_counts_per_preference.png') }}" alt="User Counts per Preference">
+<h2 class="text-primary mt-5">Most Liked Cuisines</h2>
+<img src="{{ url_for('static', filename='most_liked_cuisines.png') }}" alt="Most Liked Cuisines">
+<h2 class="text-primary mt-5">Recipe Ratings</h2>
+<img src="{{ url_for('static', filename='top_rated_recipes.png') }}" alt="Top Rated Recipes">
+
+
+{% endblock %}

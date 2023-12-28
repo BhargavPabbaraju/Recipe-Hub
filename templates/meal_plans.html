@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .meal-plan {
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+    .meal-plan-title {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+    }
+    .meals {
+        display: flex;
+        align-items: center;
+    }
+    .meal {
+        margin-right: 20px;
+    }
+    .favorite-heart {
+        color: red;
+        cursor: pointer;
+    }
+</style>
+
+<br>
+<h2 class="mb-4 mt-5">Meal Plans</h2>
+{% for plan in meal_plans %}
+    <div class="meal-plan">
+        <div class="meal-plan-title text-secondary">
+            {{ plan['meal_plan_name'] }}
+            <!-- Heart icon for favoriting meal plan -->
+            {% if session['user'] %}
+                {% if plan['liked_by_user'] %}
+                <a href="{{url_for('like_meal_plan',meal_plan=plan['meal_plan_name'])}}"><i class="bi bi-heart-fill favorite-heart"></i></a>
+                {% else %}  
+                <a href="{{url_for('like_meal_plan',meal_plan=plan['meal_plan_name'])}}"><i class="bi bi-heart favorite-heart"></i></a>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="meals">
+            <!-- Display breakfast, lunch, dinner, snack -->
+            <div class="meal">Breakfast: <a href="{{url_for('recipe',recipe_name=plan['breakfast_name'])}}">{{ plan['breakfast_name'] }}</a></div>
+            <div class="meal">Lunch: <a href="{{url_for('recipe',recipe_name= plan['lunch_name'])}}">{{ plan['lunch_name']  }}</a></div>
+            <div class="meal">Dinner: <a href="{{url_for('recipe',recipe_name=  plan['dinner_name'])}}">{{ plan['dinner_name']  }}</a></div>
+            <div class="meal">Snack: <a href="{{url_for('recipe',recipe_name= plan['snack_name'])}}">{{ plan['snack_name']  }}</a></div>
+        </div>
+    </div>
+    {% endfor %}
+
+
+{% endblock %}

@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br>
+
+<!-- Recipe Name Section -->
+<div>
+    <h2 class="text-primary mt-5 d-inline-block">{{ recipe['recipe_name'] }}</h2> 
+    {% if session['user'] %}
+    
+    <div class=" d-inline-block ms-5 favorite-icon">
+        <a href="/like_recipe" class="text-decoration-none text-dark d-inline-block rounded-circle p-1 bg-dark d-flex justify-content-center " style="width: 32px; height: 32px;" data-recipe="{{ recipe['recipe_name'] }}">
+            {% if user_liked_recipe %}
+            <i class="bi bi-heart-fill fs-5 text-secondary"></i>
+            {% else %}
+            <i class="bi bi-heart fs-5 text-secondary" id="heart"></i>
+            {% endif %}
+        </a>
+    </div>
+    {% endif %}
+    <p>
+        {% for i in range(1, 6) %}
+            {% if recipe['rating'] >= i %}
+                <i class="bi bi-star-fill text-warning"></i>
+            {% elif recipe['rating'] + 0.5 >= i %}
+                <i class="bi bi-star-half text-warning"></i>
+            {% else %}
+                <i class="bi bi-star text-warning"></i>
+            {% endif %}
+        {% endfor %}
+        | Rating: {{ recipe['rating'] }} | Favorited: {{ recipe['like_count'] }} times
+    </p>
+</div>
+
+<!-- Description Section -->
+<p>{{ recipe['tagline'] }}</p>
+
+<!-- Images Slideshow using Bootstrap Carousel -->
+{% if recipe['images'] %}
+<div id="recipeCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000"  style="height: 400px; width:600px;">
+    <div class="carousel-indicators">
+        {% for image in recipe['images'] %}
+            <button type="button" data-bs-target="#recipeCarousel" data-bs-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active"{% endif %}></button>
+        {% endfor %}
+    </div>
+    <div class="carousel-inner">
+        {% for image in recipe['images'] %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                <img src="{{ image['recipe_image'] }}" class="d-block w-100" alt="Recipe Image" style="height: 400px; object-fit: cover;">
+            </div>
+        {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#recipeCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#recipeCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+{% else %}
+<img src="{{ url_for('static', filename='no_image_found.png') }}" width="600" height="400">
+{% endif %}
+
+<!-- Box showing prep time, cook time, and total time -->
+<div class="mt-4 bg-info text-light pt-4 rounded">
+    <div class="row">
+        <div class="col-2">
+            <br>
+        </div>
+        <div class="col-3">
+            <p><strong>Preparation Time:</strong> </p>
+        </div>
+        
+        <div class="col-3">
+            <p><strong>Cooking Time:</strong></p>
+        </div>
+        <div class="col-3">
+            <p><strong>Total Time:</strong> </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-2">
+            <br>
+        </div>
+        <div class="col-3">
+            <p><strong>{{ recipe['prep_time']}}</strong> </p>
+        </div>
+        
+        <div class="col-3">
+            <p><strong>{{ recipe['cook_time']}}</strong></p>
+        </div>
+        <div class="col-3">
+            <p><strong>{{ recipe['total_time']}}</strong> </p>
+        </div>
+    </div>
+   
+</div>
+
+<div class="mt-4">
+    <h3 class="text-secondary">Ingredients</h3>
+    <ul>
+        {% for ingredient in recipe['ingredients'] %}
+            <li>
+                
+                {{ ingredient['quantity'] }} {{ ingredients[ingredient['ingredient_name']]['measurement'] }} <a href="{{url_for('ingredient',ingredient_name=ingredient['ingredient_name'])}}">{{ ingredient['ingredient_name'] }}</a> 
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="mt-4">
+    <h3 class="text-secondary">Directions</h3>
+    <ul>
+        {% for step in recipe['steps'] %}
+            <li>
+                <h6 class="text-dark">Step {{step["step_number"]}}</h6>
+                <p> {{step['instruction']}} </p>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="mt-4">
+    <h3 class="text-secondary">Reviews</h3>
+    <!-- Existing Reviews -->
+    <div class="mb-4">
+        {% for review in reviews %}
+            <div class="card mb-3">
+                <div class="card-body position-relative">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <img src={{review['avatar']}} alt="User Avatar" class="rounded-circle me-2" style="width: 48px; height: 48px;">
+                            <div>
+                                <p class="mb-0"><strong>{{ review['first_name'] }} {{ review['last_name'] }}</strong></p>
+                                {% set integer_part = review['rating'] | int %}
+                                {% set decimal_part = review['rating'] - integer_part %}
+                                
+                                {% for i in range(1, 6) %}
+                                    {% if i <= integer_part %}
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    {% elif decimal_part and i == integer_part + 1 %}
+                                        <i class="bi bi-star-half text-warning"></i>
+                                    {% else %}
+                                        <i class="bi bi-star text-warning"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                | {{ review['date'] }}
+                                </p>
+                            </div>
+                        </div>
+                        <span class="badge bg-primary fs-6 mt-3">{{ review['rating'] }}</span>
+                    </div>
+                    <p>{{ review['user_comment'] }}</p>
+                    
+                    {% if review['user_id'] == session['user']['user_id']%}
+                        <!-- Edit option (pencil icon) for the user's own review -->
+                        <span class="position-absolute top-0 end-0">
+                            <i class="p-2 fs-4 bi bi-pencil-square text-info edit-review" id="edit-icon" style="cursor: pointer;"></i>
+                            <i class="p-2 fs-4 bi bi-trash text-danger delete-review" style="cursor: pointer;" id="delete-icon"></i>
+                        </span>
+
+                        <div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="editReviewModalLabel">Edit Review</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                  <form id="editReviewForm" method="post" action="/post_comment">
+                                    <div class="mb-3">
+                                      <label for="rating" class="form-label">Rating</label>
+                                      <input type="number" class="form-control" id="userRating" name="rating" min="1" max="5" step="0.1" required>
+                                    </div>
+                                    <div class="mb-3">
+                                      <label for="comment" class="form-label">Comment</label>
+                                      <textarea class="form-control" id="commentText" name="comment" rows="3" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
+                          </div>                          
+
+                        
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+
+    <!-- Add Review Form -->
+    {% if session['user'] and user_review|count < 1 %}
+        <div>
+            <h4>Add Your Review</h4>
+            <form action="/post_comment" method="post">
+                <div class="mb-3">
+                    <label for="userRating" class="form-label">Your Rating:</label>
+                    <input type="number" class="form-control" id="userRating" name="rating" min="1" max="5" step="0.1" required>
+                </div>
+                <div class="mb-3">
+                    <label for="commentText" class="form-label">Your Comment:</label>
+                    <textarea class="form-control" id="commentText" name="comment" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Comment</button>
+            </form>
+        </div>
+
+        
+    {% endif %}
+
+    
+</div>
+
+<!-- Bootstrap JS script for Carousel -->
+<script>
+    var myCarousel = document.querySelector('#recipeCarousel');
+    var carousel = new bootstrap.Carousel(myCarousel);
+    
+    $(document).ready(function() {
+    $('#delete-icon').click(function() {
+        $.ajax({
+            type: 'POST',
+            url: '/delete_review',
+            success: function(response) {
+                // Handle the response here
+                // For example, redirect to the recipe page or show a success message
+                location.reload();
+            },
+            error: function(error) {
+                // Handle any errors here
+                console.log(error);
+            }
+        });
+    });
+});
+
+$(document).ready(function() {
+    $('#edit-icon').click(function() {
+        $('#editReviewModal').modal('show');
+    });
+});
+
+
+
+
+
+    
+</script>
+
+
+
+
+
+{% endblock %}

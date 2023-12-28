@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br>
+<h2 class="text-primary mt-5 d-inline-block">{{ ing['ingredient_name'] }}</h2>
+
+<style>
+    .caloric-info {
+        border: 3px solid #333;
+        padding: 10px;
+        
+       
+
+    }
+</style>
+{% if ing['image_link'] %}
+<img src="{{ ing['image_link'] }}" class="d-block" alt="Recipe Image" style="height: 64px; object-fit: cover;">
+{% else %}
+    <img src="{{ url_for('static', filename='no_image_found.png') }}"  class="d-block" style="height: 64px; object-fit: cover">
+{% endif %}
+
+<div class="w-25 rounded caloric-info mb-0" style="margin-top: 50px; margin-bottom:0px;">
+    <h5 class="color-dark"><b>Nutrition Facts</b></h5>
+</div>
+<div class="caloric-info w-25 rounded mt-0">
+    <h5 class="color-dark d-inline-block me-4 mb-0">Calories</h5>
+    <p class="d-inline-block mb-0">{{ '%0.2f'| format(ing['calories'] |float)}} kcal</p>
+    <hr>
+    <h5 class="color-dark d-inline-block me-4 mb-0">Protein</h5>
+    <p class="d-inline-block mb-0">{{ '%0.2f'| format(ing['protein'] |float)}} g</p>
+    <hr>
+    <h5 class="color-dark d-inline-block me-4 mb-0">Fats</h5>
+    <p class="d-inline-block mb-0">{{ '%0.2f'| format(ing['fats'] |float)}} g</p>
+    <hr>
+    <h5 class="color-dark d-inline-block me-4 mb-0">Carbs</h5>
+    <p class="d-inline-block mb-0">{{ '%0.2f'| format(ing['carbs'] |float)}} g</p>
+    <hr>
+    <h5 class="color-dark d-inline-block me-4 mb-0">Sugar</h5>
+    <p class="d-inline-block mb-0">{{ '%0.2f'| format(ing['sugar'] |float)}} g</p>
+</div> 
+
+<div class="mt-5">
+    {% for store in ing['store_links'] %}
+        {% if store['store_link'] %}
+        <p>Can be bought at : 
+            <a href="{{store['store_link']}}">{{store['store_name']}}</a></p>
+        {% endif %}
+        
+    {% endfor %}
+</div>
+{% endblock %}
